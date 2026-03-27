@@ -10,6 +10,7 @@ var spawn_position: Vector2 = Vector2.ZERO
 func _ready():
 	body_entered.connect(_on_body_entered)
 	spawn_position = global_position
+	add_to_group("enemy_bullets")
 
 func _process(delta):
 	# Déplacer le projectile dans la direction voulue

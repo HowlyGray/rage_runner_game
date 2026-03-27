@@ -12,6 +12,8 @@ extends Node2D
 @onready var affliction_bar = $CanvasLayer/HUD/AfflictionBar
 @onready var health_display = $CanvasLayer/HUD/HealthDisplay
 @onready var confidence_bar = $CanvasLayer/HUD/ConfidenceBar
+@onready var ammo_label = $CanvasLayer/HUD/AmmoLabel
+@onready var blanks_label = $CanvasLayer/HUD/BlanksLabel
 
 # Variables de vague
 var current_wave: int = 1
@@ -21,6 +23,10 @@ var wave_start_time: float = 0.0
 var is_game_active: bool = false
 
 func _ready():
+	# Attacher le script de caméra si nécessaire
+	if camera and not camera.get_script():
+		camera.set_script(load("res://scripts/camera.gd"))
+
 	# Connecter les signaux du GameManager
 	GameManager.game_over.connect(_on_game_over)
 	GameManager.score_changed.connect(_on_score_changed)
@@ -35,6 +41,8 @@ func _ready():
 		player.health_changed.connect(_on_health_changed)
 		player.player_died.connect(_on_player_died)
 		player.confidence_changed.connect(_on_confidence_changed)
+		player.ammo_changed.connect(_on_ammo_changed)
+		player.blanks_changed.connect(_on_blanks_changed)
 
 	# Récupérer la vague de départ depuis le GameManager
 	current_wave = GameManager.current_wave
@@ -72,6 +80,7 @@ func start_wave(wave_num: int):
 		player.position = Vector2(640, 360)
 		player.velocity = Vector2.ZERO
 		player.rotation = 0.0
+		player.reset_blanks()
 
 	# Configurer et démarrer le spawner
 	if spawner:
@@ -155,6 +164,18 @@ func _on_player_hit(_debuff_type):
 	# Légère pénalité de score quand touché par un commentaire
 	GameManager.add_score(-10)
 
+	# Shake camera
+	if camera and camera.has_method("add_shake"):
+		camera.add_shake(10.0)
+
+	# Hit stop
+	trigger_hit_stop(0.1, 0.1)
+
+func trigger_hit_stop(time_scale: float, duration: float):
+	Engine.time_scale = time_scale
+	await get_tree().create_timer(duration * time_scale).timeout
+	Engine.time_scale = 1.0
+
 func _on_debuff_applied(_debuff_type, _duration):
 	update_debuffs_display()
 
@@ -196,6 +217,13 @@ func _on_health_changed(current_health, max_health):
 	if health_display:
 		health_display.update_health(current_health, max_health)
 
+	# Shake camera on damage
+	if camera and camera.has_method("add_shake"):
+		camera.add_shake(20.0)
+
+	# Hit stop on damage
+	trigger_hit_stop(0.05, 0.2)
+
 func _on_player_died():
 	is_game_active = false
 	GameManager.trigger_game_over()
@@ -203,3 +231,23 @@ func _on_player_died():
 func _on_confidence_changed(confidence_value, is_immune, immunity_time):
 	if confidence_bar:
 		confidence_bar.update_confidence(confidence_value, is_immune, immunity_time)
+
+func _on_ammo_changed(current_ammo, max_ammo, is_reloading):
+	if ammo_label:
+		if is_reloading:
+			ammo_label.text = "RECHARGEMENT..."
+			ammo_label.modulate = Color.YELLOW
+		else:
+			ammo_label.text = "MUN: %d / %d" % [current_ammo, max_ammo]
+			if current_ammo == 0:
+				ammo_label.modulate = Color.RED
+			else:
+				ammo_label.modulate = Color.WHITE
+
+func _on_blanks_changed(blanks_remaining):
+	if blanks_label:
+		blanks_label.text = "BLANKS: %d" % blanks_remaining
+		if blanks_remaining == 0:
+			blanks_label.modulate = Color.GRAY
+		else:
+			blanks_label.modulate = Color.CYAN

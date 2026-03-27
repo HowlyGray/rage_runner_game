@@ -118,12 +118,27 @@ func take_damage(amount: int):
 
 	# Flash blanc pour feedback visuel
 	if sprite:
-		sprite.modulate = Color.WHITE
-		await get_tree().create_timer(0.1).timeout
-		setup_appearance()
+		sprite.modulate = Color(10, 10, 10) # Overbright white for HDR-like flash
+		var tween = create_tween()
+		tween.tween_property(sprite, "modulate", get_type_color(), 0.1)
+
+	# Screen shake on enemy hit
+	var players = get_tree().get_nodes_in_group("player")
+	if players.size() > 0:
+		var game_scene = get_parent()
+		if game_scene and game_scene.get("camera") and game_scene.camera.has_method("add_shake"):
+			game_scene.camera.add_shake(3.0)
 
 	if health <= 0:
 		die()
+
+func get_type_color() -> Color:
+	match enemy_type:
+		EnemyType.BRUTE:
+			return Color(0.8, 0.4, 0.0)
+		EnemyType.SHOOTER:
+			return Color(0.6, 0.0, 0.6)
+	return Color.WHITE
 
 func die():
 	emit_signal("enemy_killed", score_value)

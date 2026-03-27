@@ -6,6 +6,7 @@ var comment_text: String = ""
 var speed: float = 200.0
 var direction: Vector2 = Vector2.DOWN  # Direction fixée au moment du spawn
 var spawn_position: Vector2 = Vector2.ZERO
+var is_dodged: bool = false # Pour éviter de compter plusieurs esquives pour le même projectile
 
 # Références
 @onready var label = $Label
@@ -32,6 +33,7 @@ const DEBUFF_COLORS = {
 func _ready():
 	body_entered.connect(_on_body_entered)
 	spawn_position = global_position
+	add_to_group("comments")
 	set_comment_appearance()
 
 func setup(type: String, spawn_speed: float, target_position: Vector2 = Vector2.ZERO):
@@ -68,3 +70,10 @@ func _on_body_entered(body):
 	if body.has_method("apply_debuff"):
 		body.apply_debuff(debuff_type)
 		queue_free()
+
+func set_as_dodged():
+	if not is_dodged:
+		is_dodged = true
+		var players = get_tree().get_nodes_in_group("player")
+		if players.size() > 0:
+			players[0].on_comment_dodged()
