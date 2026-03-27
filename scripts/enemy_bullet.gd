@@ -2,18 +2,21 @@ extends Area2D
 
 var speed: float = 300.0
 var damage: int = 1
+var direction: Vector2 = Vector2.DOWN  # Direction vers le joueur au moment du tir
+var spawn_position: Vector2 = Vector2.ZERO
 
 @onready var sprite = $Sprite2D
 
 func _ready():
 	body_entered.connect(_on_body_entered)
+	spawn_position = global_position
 
 func _process(delta):
-	# Déplacer le projectile vers le bas
-	position.y += speed * delta
-	
-	# Détruire si hors écran
-	if position.y > 800:
+	# Déplacer le projectile dans la direction voulue
+	position += direction * speed * delta
+
+	# Détruire si trop éloigné du point d'origine
+	if global_position.distance_to(spawn_position) > 1200:
 		queue_free()
 
 func _on_body_entered(body):
