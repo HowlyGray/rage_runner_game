@@ -18,7 +18,7 @@ func _ready():
 
 func update_display():
 	if congratulations_label:
-		congratulations_label.text = "🎉 FÉLICITATIONS! 🎉\nVous avez terminé tous les niveaux!"
+		congratulations_label.text = "🎉 FÉLICITATIONS! 🎉\nVous avez survécu aux 99 vagues!"
 	
 	if final_score_label:
 		final_score_label.text = "Score Total: %d" % GameManager.current_score

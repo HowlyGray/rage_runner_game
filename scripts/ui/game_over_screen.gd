@@ -27,7 +27,7 @@ func update_score_display():
 			high_score_label.text = "Meilleur Score: %d" % GameManager.high_score
 
 func _on_retry_pressed():
-	GameManager.start_game(GameManager.current_level)
+	GameManager.start_game(GameManager.current_wave)
 	get_tree().change_scene_to_file("res://scenes/game/game_scene.tscn")
 
 func _on_main_menu_pressed():

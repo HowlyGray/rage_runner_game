@@ -4,6 +4,8 @@ extends Area2D
 var debuff_type: String = "lent"
 var comment_text: String = ""
 var speed: float = 200.0
+var direction: Vector2 = Vector2.DOWN  # Direction fixée au moment du spawn
+var spawn_position: Vector2 = Vector2.ZERO
 
 # Références
 @onready var label = $Label
@@ -29,30 +31,37 @@ const DEBUFF_COLORS = {
 
 func _ready():
 	body_entered.connect(_on_body_entered)
+	spawn_position = global_position
 	set_comment_appearance()
 
-func setup(type: String, spawn_speed: float):
+func setup(type: String, spawn_speed: float, target_position: Vector2 = Vector2.ZERO):
 	debuff_type = type
 	speed = spawn_speed
-	
+
 	# Choisir un texte aléatoire pour ce type de commentaire
 	var texts = COMMENT_TEXTS.get(type, ["Commentaire rageux!"])
 	comment_text = texts[randi() % texts.size()]
+
+	# Calculer la direction vers le joueur au moment du spawn
+	if target_position != Vector2.ZERO:
+		direction = (target_position - global_position).normalized()
+		if direction == Vector2.ZERO:
+			direction = Vector2.DOWN
 
 func set_comment_appearance():
 	if label:
 		label.text = comment_text
 		label.modulate = DEBUFF_COLORS.get(debuff_type, Color.WHITE)
-	
+
 	if sprite:
 		sprite.modulate = DEBUFF_COLORS.get(debuff_type, Color.WHITE)
 
 func _process(delta):
-	# Déplacer le commentaire vers le bas
-	position.y += speed * delta
-	
-	# Détruire le commentaire s'il sort de l'écran
-	if position.y > 800:
+	# Déplacer le commentaire dans la direction fixée vers le joueur
+	position += direction * speed * delta
+
+	# Détruire si trop éloigné de la position de spawn
+	if global_position.distance_to(spawn_position) > 1500:
 		queue_free()
 
 func _on_body_entered(body):

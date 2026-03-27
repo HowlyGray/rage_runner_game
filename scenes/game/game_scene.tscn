@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://b5tquwb6jmt0d"]
+[gd_scene load_steps=13 format=3 uid="uid://b5tquwb6jmt0d"]
 
 [ext_resource type="Script" uid="uid://bugejjjw8011" path="res://scripts/game_scene.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/game/player.tscn" id="2"]
@@ -6,6 +6,18 @@
 [ext_resource type="Script" uid="uid://cmuuo0v6ox5s1" path="res://scripts/ui/health_display.gd" id="4"]
 [ext_resource type="Script" uid="uid://b0s32ljpjh0uw" path="res://scripts/ui/affliction_bar.gd" id="5"]
 [ext_resource type="Script" uid="uid://ba13taucivvxe" path="res://scripts/ui/confidence_bar.gd" id="6"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_top"]
+size = Vector2(1400, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bottom"]
+size = Vector2(1400, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_left"]
+size = Vector2(20, 800)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_right"]
+size = Vector2(20, 800)
 
 [node name="GameScene" type="Node2D"]
 script = ExtResource("1")
@@ -15,8 +27,32 @@ offset_right = 1280.0
 offset_bottom = 720.0
 color = Color(0.1, 0.1, 0.15, 1)
 
+[node name="Camera2D" type="Camera2D" parent="."]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+drag_horizontal_enabled = false
+drag_vertical_enabled = false
+
+[node name="ArenaBounds" type="StaticBody2D" parent="."]
+
+[node name="WallTop" type="CollisionShape2D" parent="ArenaBounds"]
+position = Vector2(640, -10)
+shape = SubResource("RectangleShape2D_top")
+
+[node name="WallBottom" type="CollisionShape2D" parent="ArenaBounds"]
+position = Vector2(640, 730)
+shape = SubResource("RectangleShape2D_bottom")
+
+[node name="WallLeft" type="CollisionShape2D" parent="ArenaBounds"]
+position = Vector2(-10, 360)
+shape = SubResource("RectangleShape2D_left")
+
+[node name="WallRight" type="CollisionShape2D" parent="ArenaBounds"]
+position = Vector2(1290, 360)
+shape = SubResource("RectangleShape2D_right")
+
 [node name="Player" parent="." instance=ExtResource("2")]
-position = Vector2(640, 650)
+position = Vector2(640, 360)
 
 [node name="CommentSpawner" type="Node2D" parent="."]
 script = ExtResource("3")
@@ -47,7 +83,7 @@ offset_top = 60.0
 offset_right = 200.0
 offset_bottom = 90.0
 theme_override_font_sizes/font_size = 20
-text = "Niveau: 1"
+text = "Vague: 1"
 
 [node name="HealthDisplay" type="HBoxContainer" parent="CanvasLayer/HUD"]
 layout_mode = 0
@@ -62,13 +98,13 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -100.0
+offset_left = -150.0
 offset_top = 20.0
-offset_right = 100.0
+offset_right = 150.0
 offset_bottom = 50.0
 grow_horizontal = 2
 theme_override_font_sizes/font_size = 24
-text = "Temps: 01:00"
+text = "Ennemis: 0"
 horizontal_alignment = 1
 
 [node name="DebuffsContainer" type="VBoxContainer" parent="CanvasLayer/HUD"]
