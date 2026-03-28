@@ -1,11 +1,13 @@
-[gd_scene load_steps=15 format=3 uid="uid://cp2lo5xti47hw"]
+[gd_scene load_steps=17 format=3 uid="uid://cp2lo5xti47hw"]
 
 [ext_resource type="Script" uid="uid://bugejjjw8011" path="res://scripts/game_scene.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://bpl7lu4kdphtp" path="res://scenes/game/player.tscn" id="2"]
+[ext_resource type="Texture2D" uid="uid://b83x2c3ymsnvi" path="res://assets/sprites/texture_03.png" id="2_gu01l"]
 [ext_resource type="Script" uid="uid://gg8orx0oyw28" path="res://scripts/comment_spawner.gd" id="3"]
 [ext_resource type="Script" uid="uid://cmuuo0v6ox5s1" path="res://scripts/ui/health_display.gd" id="4"]
 [ext_resource type="Script" uid="uid://b0s32ljpjh0uw" path="res://scripts/ui/affliction_bar.gd" id="5"]
 [ext_resource type="Script" uid="uid://ba13taucivvxe" path="res://scripts/ui/confidence_bar.gd" id="6"]
+[ext_resource type="PackedScene" uid="uid://ci0or4c286frg" path="res://scenes/game/cactus.tscn" id="7_06uhe"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.1, 0.1, 0.2, 1)
@@ -30,6 +32,9 @@ subdivide_depth = 4
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
 albedo_color = Color(0.1, 0.1, 0.15, 1)
+albedo_texture = ExtResource("2_gu01l")
+uv1_scale = Vector3(1.5, 1.5, 1.5)
+uv1_triplanar = true
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wall_h"]
 size = Vector3(200, 10, 1)
@@ -58,7 +63,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 shape = SubResource("BoxShape3D_floor")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Arena/Floor"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 mesh = SubResource("PlaneMesh_1")
 surface_material_override/0 = SubResource("StandardMaterial3D_floor")
 
@@ -269,3 +273,6 @@ horizontal_alignment = 1
 show_behind_parent = true
 layout_mode = 2
 color = Color(0.2, 0.2, 0.2, 0.5)
+
+[node name="cactus" parent="." instance=ExtResource("7_06uhe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.151887, 0.118918896, 0)
