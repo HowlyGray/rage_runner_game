@@ -22,7 +22,7 @@ func _input(event):
 
 func _on_resume_pressed():
 	GameManager.resume_game()
-	queue_free()  # Retour au jeu
+	get_parent().queue_free()  # Libère le CanvasLayer et le menu
 
 func _on_restart_pressed():
 	GameManager.resume_game()
@@ -32,7 +32,6 @@ func _on_restart_pressed():
 func _on_settings_pressed():
 	var settings = load("res://scenes/ui/settings_menu.tscn").instantiate()
 	settings.from_pause = true
-	settings.process_mode = Node.PROCESS_MODE_ALWAYS
 	get_parent().add_child(settings)
 	queue_free()
 

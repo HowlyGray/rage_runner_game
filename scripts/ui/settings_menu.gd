@@ -57,7 +57,6 @@ func _on_back_pressed():
 	GameManager.save_settings()
 	if from_pause:
 		var pause_menu = load("res://scenes/ui/pause_menu.tscn").instantiate()
-		pause_menu.process_mode = Node.PROCESS_MODE_ALWAYS
 		get_parent().add_child(pause_menu)
 		queue_free()
 	else:
