@@ -1,4 +1,4 @@
-extends CharacterBody2D
+extends CharacterBody3D
 
 # Signaux
 signal hit_by_comment(debuff_type)
@@ -18,18 +18,17 @@ enum State { NORMAL, STUNNED, IMMUNE, DODGING }
 var current_state: State = State.NORMAL
 
 # Constantes
-const BASE_SPEED = 400.0
-const BASE_SCALE = Vector2(1.0, 1.0)
+const BASE_SPEED = 15.0  # Vitesse 3D ajustée
 const BUFF_SPEED_MULTIPLIER = 1.3  # +30% de vitesse en buff
 
 # Variables de mouvement
 var current_speed: float = BASE_SPEED
-var dodge_speed: float = 800.0
+var dodge_speed: float = 30.0
 var dodge_duration: float = 0.3
 var dodge_cooldown: float = 0.6
 var dodge_timer: float = 0.0
 var dodge_cooldown_timer: float = 0.0
-var dodge_direction: Vector2 = Vector2.ZERO
+var dodge_direction: Vector3 = Vector3.ZERO
 
 # Système de vie
 var health: int = 3
@@ -79,7 +78,7 @@ var bullet_spread: float = 0.1 # Radians
 # Système de Blanks
 var blanks: int = 2
 var max_blanks: int = 2
-var blank_radius: float = 1000.0
+var blank_radius: float = 50.0 # Rayon 3D ajusté
 
 # Débuffs actifs
 var active_debuffs = {}
@@ -91,12 +90,13 @@ var affliction_time: float = 0.0  # Temps total d'affliction (peut être négati
 var is_buffed: bool = false
 
 # Références
-@onready var sprite = $Sprite2D
-@onready var collision = $CollisionShape2D
+@onready var visual_root = $VisualRoot
+@onready var mesh = $VisualRoot/MeshInstance3D
+@onready var collision = $CollisionShape3D
 @onready var debuff_timer = $DebuffTimer
 
 # Détection d'esquive
-var dodge_detector: Area2D
+var dodge_detector: Area3D
 
 # Durées des débuffs (en secondes)
 const DEBUFF_DURATIONS = {
@@ -108,13 +108,13 @@ const DEBUFF_DURATIONS = {
 }
 
 func _ready():
-	# Initialiser la position du joueur au centre
-	position = Vector2(640, 360)
+	# Initialiser la position du joueur au centre (Y=0.5 pour être sur le sol)
+	position = Vector3(0, 0.5, 0)
 
 	# Créer la zone de détection d'esquive programmatiquement
 	setup_dodge_detector()
 
-	# Charger la scène du projectile
+	# Charger la scène du projectile 3D (elle devra être convertie aussi)
 	bullet_scene = preload("res://scenes/game/player_bullet.tscn")
 
 	# Émettre les signaux initiaux
@@ -168,19 +168,33 @@ func _process(delta):
 		use_blank()
 
 func _physics_process(delta):
-	# Toujours pointer vers la souris (visée 360°) sauf pendant le dodge
+	# Visée 360° vers la souris (intersection avec le plan XZ)
 	if current_state != State.DODGING:
-		look_at(get_global_mouse_position())
+		look_at_mouse()
 
 	handle_movement(delta)
 	move_and_slide()
 
+func look_at_mouse():
+	var mouse_pos = get_viewport().get_mouse_position()
+	var camera = get_viewport().get_camera_3d()
+	if not camera: return
+
+	var ray_origin = camera.project_ray_origin(mouse_pos)
+	var ray_direction = camera.project_ray_normal(mouse_pos)
+
+	# Intersection avec le plan horizontal Y=0.5
+	var t = (0.5 - ray_origin.y) / ray_direction.y
+	var target = ray_origin + ray_direction * t
+
+	look_at(Vector3(target.x, position.y, target.z), Vector3.UP)
+
 func setup_dodge_detector():
-	dodge_detector = Area2D.new()
-	var shape = CollisionShape2D.new()
-	var circle = CircleShape2D.new()
-	circle.radius = 100.0
-	shape.shape = circle
+	dodge_detector = Area3D.new()
+	var shape = CollisionShape3D.new()
+	var sphere = SphereShape3D.new()
+	sphere.radius = 4.0 # Rayon d'esquive en 3D
+	shape.shape = sphere
 	dodge_detector.add_child(shape)
 	add_child(dodge_detector)
 	dodge_detector.area_exited.connect(_on_dodge_area_exited)
@@ -197,22 +211,23 @@ func handle_movement(delta):
 			end_dodge()
 		return
 
-	# Mouvement 2D complet (WASD / ZQSD / Flèches)
+	# Mouvement 3D sur le plan XZ
 	var input_vec = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var move_dir = Vector3(input_vec.x, 0, input_vec.y)
 
 	# Gérer le déclenchement du dodge
-	if Input.is_action_just_pressed("dodge") and dodge_cooldown_timer <= 0 and input_vec != Vector2.ZERO:
-		start_dodge(input_vec)
+	if Input.is_action_just_pressed("dodge") and dodge_cooldown_timer <= 0 and move_dir != Vector3.ZERO:
+		start_dodge(move_dir)
 		return
 
 	# Appliquer l'inversion si le débuff "confus" est actif
 	if inverted_controls:
-		input_vec = -input_vec
+		move_dir = -move_dir
 
-	# Appliquer le mouvement (les murs StaticBody2D gèrent les limites de l'arène)
-	velocity = input_vec * current_speed
+	# Appliquer le mouvement
+	velocity = move_dir * current_speed
 
-func start_dodge(direction: Vector2):
+func start_dodge(direction: Vector3):
 	current_state = State.DODGING
 	dodge_direction = direction.normalized()
 	dodge_timer = dodge_duration
@@ -221,9 +236,9 @@ func start_dodge(direction: Vector2):
 	# Invincibilité pendant le dodge
 	invincible = true
 
-	# Effet visuel (inclinaison ou traînée peut être ajouté plus tard)
-	if sprite:
-		sprite.modulate.a = 0.5
+	# Effet visuel
+	if mesh:
+		mesh.transparency = 0.5
 
 func end_dodge():
 	if is_emotionally_immune:
@@ -232,39 +247,28 @@ func end_dodge():
 		current_state = State.NORMAL
 
 	invincible = false
-	if sprite:
-		sprite.modulate.a = 1.0
+	if mesh:
+		mesh.transparency = 0.0
 
 func apply_debuff(debuff_type: String):
 	# Si en train de dodger ou immunité émotionnelle active, ignorer le débuff
 	if current_state == State.DODGING or is_emotionally_immune:
-		# Optionnel : déclencher on_comment_dodged si c'est un "close call"
-		# Mais ici on a été touché, donc c'est une esquive de justesse
 		on_comment_dodged()
-
-		# Effet visuel pour montrer l'esquive/immunité
-		if sprite:
-			var tween = create_tween()
-			tween.tween_property(sprite, "modulate", Color(1.0, 1.0, 0.0), 0.1)
-			tween.tween_property(sprite, "modulate", Color(1.0, 1.0, 1.0), 0.1)
+		# Flash visuel
 		return
 
 	emit_signal("hit_by_comment", debuff_type)
 
-	# Réduire la confiance
 	modify_confidence(-CONFIDENCE_HIT_LOSS)
 
-	# Ajouter le temps d'affliction
 	var debuff_duration = DEBUFF_DURATIONS[debuff_type]
 	affliction_time += debuff_duration
 	emit_signal("affliction_changed", affliction_time)
 
-	# Si le débuff est déjà actif, réinitialiser le timer
 	if active_debuffs.has(debuff_type):
 		active_debuffs[debuff_type].time_left = debuff_duration
 		return
 
-	# Créer un nouveau timer pour ce débuff
 	var timer = Timer.new()
 	timer.wait_time = debuff_duration
 	timer.one_shot = true
@@ -279,14 +283,13 @@ func apply_debuff(debuff_type: String):
 		"lent":
 			current_speed = BASE_SPEED * 0.5
 		"nul":
-			scale = BASE_SCALE * 0.7
+			if mesh:
+				mesh.scale = Vector3(0.7, 0.7, 0.7)
 		"fragile":
 			if collision:
-				collision.scale = Vector2(1.5, 1.5)
+				collision.scale = Vector3(1.5, 1.5, 1.5)
 		"aveugle":
 			reduced_visibility = true
-			if sprite:
-				sprite.modulate.a = 0.5
 		"confus":
 			inverted_controls = true
 
@@ -303,16 +306,14 @@ func _on_debuff_expired(debuff_type: String):
 			if not active_debuffs.has("lent"):
 				current_speed = BASE_SPEED
 		"nul":
-			if not active_debuffs.has("nul"):
-				scale = BASE_SCALE
+			if not active_debuffs.has("nul") and mesh:
+				mesh.scale = Vector3.ONE
 		"fragile":
 			if not active_debuffs.has("fragile") and collision:
-				collision.scale = Vector2(1.0, 1.0)
+				collision.scale = Vector3.ONE
 		"aveugle":
 			if not active_debuffs.has("aveugle"):
 				reduced_visibility = false
-				if sprite:
-					sprite.modulate.a = 1.0
 		"confus":
 			if not active_debuffs.has("confus"):
 				inverted_controls = false
@@ -325,74 +326,48 @@ func reset():
 		debuff.queue_free()
 	active_debuffs.clear()
 
-	# Réinitialiser les stats
 	current_speed = BASE_SPEED
-	scale = BASE_SCALE
+	if mesh:
+		mesh.scale = Vector3.ONE
 	inverted_controls = false
 	reduced_visibility = false
 	if collision:
-		collision.scale = Vector2(1.0, 1.0)
-	if sprite:
-		sprite.modulate = Color(1.0, 1.0, 1.0)
+		collision.scale = Vector3.ONE
 
-	# Réinitialiser la position au centre de l'arène
-	position = Vector2(640, 360)
-	velocity = Vector2.ZERO
-	rotation = 0.0
-
-func get_active_debuffs() -> Array:
-	return active_debuffs.keys()
+	position = Vector3(0, 0.5, 0)
+	velocity = Vector3.ZERO
+	rotation = Vector3.ZERO
 
 func collect_compliment(healing_time: float):
 	emit_signal("compliment_collected", healing_time)
-
-	# Augmenter la confiance
 	modify_confidence(CONFIDENCE_COMPLIMENT_GAIN)
-
-	# Réduire le temps d'affliction
 	affliction_time -= healing_time
-
-	# Si on passe en négatif (buff), appliquer le buff
 	if affliction_time < 0 and not is_buffed:
 		apply_buff()
-
 	emit_signal("affliction_changed", affliction_time)
 
 func apply_buff():
 	is_buffed = true
-	# Appliquer les effets positifs
 	current_speed = BASE_SPEED * BUFF_SPEED_MULTIPLIER
-	if sprite:
-		sprite.modulate = Color(0.5, 1.0, 0.5)  # Teinte verte pour le buff
 
 func remove_buff():
-	if not is_buffed:
-		return
+	if not is_buffed: return
 	is_buffed = false
 	current_speed = BASE_SPEED
-	if sprite:
-		sprite.modulate = Color(1.0, 1.0, 1.0)
 
 func clear_all_debuffs():
-	# Supprimer tous les débuffs
 	for debuff in active_debuffs.keys():
 		_on_debuff_expired(debuff)
 
-func get_affliction_time() -> float:
-	return affliction_time
-
 func handle_shooting(delta):
-	# Cooldown du tir
 	if shoot_timer > 0:
 		shoot_timer -= delta
 		if shoot_timer <= 0:
 			can_shoot = true
 
-	# Gérer le rechargement manuel
 	if Input.is_action_just_pressed("reload") and not is_reloading and current_ammo < max_ammo:
 		start_reload()
 
-	# Auto-fire : LMB maintenu ou ESPACE maintenu
 	if Input.is_action_pressed("shoot") and can_shoot and not is_reloading:
 		if current_ammo > 0:
 			shoot()
@@ -400,8 +375,7 @@ func handle_shooting(delta):
 			start_reload()
 
 func start_reload():
-	if is_reloading:
-		return
+	if is_reloading: return
 	is_reloading = true
 	reload_timer = reload_time
 	emit_signal("ammo_changed", current_ammo, max_ammo, is_reloading)
@@ -412,100 +386,64 @@ func complete_reload():
 	emit_signal("ammo_changed", current_ammo, max_ammo, is_reloading)
 
 func shoot():
-	if not bullet_scene:
-		return
-
+	if not bullet_scene: return
 	current_ammo -= 1
 	emit_signal("ammo_changed", current_ammo, max_ammo, is_reloading)
 
-	# Créer un projectile dans la direction visée avec un peu de spread
 	var bullet = bullet_scene.instantiate()
-
-	# Appliquer le spread
 	var spread = randf_range(-bullet_spread, bullet_spread)
-	var shoot_dir = transform.x.rotated(spread)
 
-	bullet.global_position = global_position + shoot_dir * 35.0
+	# Direction de tir basée sur l'orientation locale (avant = -Z en 3D Godot par convention, mais on utilise look_at donc c'est -Z)
+	var shoot_dir = -transform.basis.z.rotated(Vector3.UP, spread)
+
+	bullet.global_position = global_position + shoot_dir * 1.5
 	bullet.direction = shoot_dir
-
-	# En mode IMMUNE (immunité émotionnelle), les balles sont perçantes
 	if is_emotionally_immune:
 		bullet.piercing = true
-
-	# Ajouter à la scène parente
 	get_parent().add_child(bullet)
 
-	# Activer le cooldown
 	can_shoot = false
 	shoot_timer = shoot_cooldown
-
 
 func is_invincible() -> bool:
 	return invincible or current_state == State.DODGING or is_emotionally_immune
 
 func take_damage(amount: int):
-	if is_invincible():
-		return
+	if is_invincible(): return
 
-	# Flash rouge sur les dégâts
-	if sprite:
+	# Feedback visuel Flash Rouge
+	if mesh:
+		var mat = mesh.get_surface_override_material(0)
+		if not mat:
+			mat = StandardMaterial3D.new()
+			mesh.set_surface_override_material(0, mat)
+		var old_color = mat.albedo_color
+		mat.albedo_color = Color.RED
 		var tween = create_tween()
-		sprite.modulate = Color.RED
-		tween.tween_property(sprite, "modulate", Color.WHITE, 0.2)
+		tween.tween_property(mat, "albedo_color", old_color, 0.2)
 
 	health -= amount
 	emit_signal("health_changed", health, max_health)
-
-	# Réduire la confiance
 	modify_confidence(-CONFIDENCE_DAMAGE_LOSS)
-
-	# Vérifier la mort
 	if health <= 0:
 		die()
 		return
-
-	# Activer l'invincibilité temporaire
 	activate_invincibility()
 
 func activate_invincibility():
 	invincible = true
-
-	# Effet visuel de clignotement
-	if sprite:
-		var tween = create_tween()
-		tween.set_loops(int(invincible_duration / 0.2))
-		tween.tween_property(sprite, "modulate:a", 0.3, 0.1)
-		tween.tween_property(sprite, "modulate:a", 1.0, 0.1)
-
-	# Timer pour retirer l'invincibilité
+	# Effet de clignotement
 	await get_tree().create_timer(invincible_duration).timeout
 	invincible = false
-	if sprite:
-		sprite.modulate.a = 1.0
 
 func die():
 	emit_signal("player_died")
-	# Ne pas détruire le joueur, laisser game_scene gérer le game over
-
-func heal(amount: int):
-	health = min(health + amount, max_health)
-	emit_signal("health_changed", health, max_health)
 
 func use_blank():
 	blanks -= 1
 	emit_signal("blanks_changed", blanks)
 
-	# Effet visuel
-	var flash = ColorRect.new()
-	flash.set_anchors_preset(Control.PRESET_FULL_RECT)
-	flash.color = Color(1, 1, 1, 0.5)
-	get_tree().root.add_child(flash)
-
-	var tween = create_tween()
-	tween.tween_property(flash, "color:a", 0.0, 0.3)
-	tween.tween_callback(flash.queue_free)
-
-	# Nettoyer les projectiles (commentaires et balles ennemies)
+	# Nettoyer les projectiles
 	var projectiles = get_tree().get_nodes_in_group("comments")
 	for p in projectiles:
 		if p.global_position.distance_to(global_position) < blank_radius:
@@ -519,79 +457,43 @@ func use_blank():
 	# Repousser les ennemis
 	var enemies = get_tree().get_nodes_in_group("enemies")
 	for e in enemies:
-		if e.global_position.distance_to(global_position) < 400.0:
-			var push_dir = e.global_position.direction_to(global_position) * -1.0
-			var push_tween = create_tween()
-			push_tween.tween_property(e, "global_position", e.global_position + push_dir * 200.0, 0.2).set_trans(Tween.TRANS_QUINT).set_ease(Tween.EASE_OUT)
+		if e.global_position.distance_to(global_position) < 15.0:
+			var push_dir = (e.global_position - global_position).normalized()
+			if e.has_method("apply_knockback"):
+				e.apply_knockback(push_dir * 20.0)
 
 func reset_blanks():
 	blanks = max_blanks
 	emit_signal("blanks_changed", blanks)
 
-# === SYSTÈME DE CONFIANCE ===
-
 func modify_confidence(amount: float):
 	confidence = clamp(confidence + amount, min_confidence, max_confidence)
-
-	# Si on atteint 100%, activer l'immunité émotionnelle
 	if confidence >= max_confidence and not is_emotionally_immune:
 		activate_emotional_immunity()
-
 	emit_signal("confidence_changed", confidence, is_emotionally_immune, immunity_timer)
 
 func activate_emotional_immunity():
 	is_emotionally_immune = true
 	current_state = State.IMMUNE
-
-	# Durée aléatoire entre min et max
 	immunity_duration = randf_range(IMMUNITY_MIN_DURATION, IMMUNITY_MAX_DURATION)
 	immunity_timer = immunity_duration
-
-	# Effet visuel (teinte dorée) + bonus de vitesse
-	if sprite:
-		sprite.modulate = Color(1.0, 0.9, 0.0)
 	current_speed = BASE_SPEED * 1.5
-
 	emit_signal("confidence_changed", confidence, is_emotionally_immune, immunity_timer)
 
 func end_emotional_immunity():
 	is_emotionally_immune = false
 	current_state = State.NORMAL
 	immunity_timer = 0.0
-
-	# Retirer le bonus de vitesse
 	current_speed = BASE_SPEED
-
-	# Retirer l'effet visuel
-	if sprite and not is_buffed:
-		sprite.modulate = Color(1.0, 1.0, 1.0)
-	elif sprite and is_buffed:
-		sprite.modulate = Color(0.5, 1.0, 0.5)  # Remettre la teinte de buff
-
-	# Réinitialiser la confiance à 50%
 	confidence = 50.0
-
 	emit_signal("confidence_changed", confidence, is_emotionally_immune, immunity_timer)
 
 func on_enemy_killed():
-	# Augmenter la confiance
 	modify_confidence(CONFIDENCE_KILL_GAIN)
 	emit_signal("enemy_killed_by_player")
 
 func on_comment_dodged():
-	# Augmenter le combo
 	dodge_combo += 1
 	last_dodge_time = Time.get_ticks_msec() / 1000.0
-
-	# Gain de confiance de base + bonus combo
 	var confidence_gain = CONFIDENCE_DODGE_GAIN + (dodge_combo * CONFIDENCE_COMBO_BONUS)
 	modify_confidence(confidence_gain)
-
-func reset_confidence():
-	confidence = 50.0
-	is_emotionally_immune = false
-	immunity_timer = 0.0
-	current_state = State.NORMAL
-	current_speed = BASE_SPEED
-	dodge_combo = 0
-	emit_signal("confidence_changed", confidence, is_emotionally_immune, immunity_timer)

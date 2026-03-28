@@ -1,16 +1,16 @@
-extends Area2D
+extends Area3D
 
 # Type de débuff que ce commentaire inflige
 var debuff_type: String = "lent"
 var comment_text: String = ""
-var speed: float = 200.0
-var direction: Vector2 = Vector2.DOWN  # Direction fixée au moment du spawn
-var spawn_position: Vector2 = Vector2.ZERO
-var is_dodged: bool = false # Pour éviter de compter plusieurs esquives pour le même projectile
+var speed: float = 10.0 # Vitesse 3D
+var direction: Vector3 = Vector3.BACK
+var spawn_position: Vector3 = Vector3.ZERO
+var is_dodged: bool = false
 
 # Références
-@onready var label = $Label
-@onready var sprite = $Sprite2D
+@onready var label = $Label3D # Utilisation de Label3D pour le texte dans le monde 3D
+@onready var mesh = $MeshInstance3D
 
 # Textes des commentaires selon le type de débuff
 const COMMENT_TEXTS = {
@@ -36,34 +36,33 @@ func _ready():
 	add_to_group("comments")
 	set_comment_appearance()
 
-func setup(type: String, spawn_speed: float, target_position: Vector2 = Vector2.ZERO):
+func setup(type: String, spawn_speed: float, target_position: Vector3 = Vector3.ZERO):
 	debuff_type = type
-	speed = spawn_speed
+	speed = spawn_speed * 0.05
 
-	# Choisir un texte aléatoire pour ce type de commentaire
 	var texts = COMMENT_TEXTS.get(type, ["Commentaire rageux!"])
 	comment_text = texts[randi() % texts.size()]
 
-	# Calculer la direction vers le joueur au moment du spawn
-	if target_position != Vector2.ZERO:
+	if target_position != Vector3.ZERO:
 		direction = (target_position - global_position).normalized()
-		if direction == Vector2.ZERO:
-			direction = Vector2.DOWN
+		direction.y = 0
+		if direction == Vector3.ZERO:
+			direction = Vector3.BACK
 
 func set_comment_appearance():
 	if label:
 		label.text = comment_text
 		label.modulate = DEBUFF_COLORS.get(debuff_type, Color.WHITE)
 
-	if sprite:
-		sprite.modulate = DEBUFF_COLORS.get(debuff_type, Color.WHITE)
+	if mesh:
+		var mat = StandardMaterial3D.new()
+		mesh.set_surface_override_material(0, mat)
+		mat.albedo_color = DEBUFF_COLORS.get(debuff_type, Color.WHITE)
 
 func _process(delta):
-	# Déplacer le commentaire dans la direction fixée vers le joueur
 	position += direction * speed * delta
 
-	# Détruire si trop éloigné de la position de spawn
-	if global_position.distance_to(spawn_position) > 1500:
+	if global_position.distance_to(spawn_position) > 100.0:
 		queue_free()
 
 func _on_body_entered(body):
