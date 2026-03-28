@@ -148,7 +148,7 @@ func update_debuffs_display():
 	if not debuffs_container: return
 	for child in debuffs_container.get_children(): child.queue_free()
 	if player:
-		var active_debuffs = player.get_active_debuffs()
+		var active_debuffs = player.active_debuffs.keys()
 		for debuff in active_debuffs:
 			var label = Label.new()
 			label.text = debuff.to_upper()
