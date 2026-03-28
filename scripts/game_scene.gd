@@ -110,9 +110,11 @@ func calculate_wave_score(elapsed_time: float) -> int:
 
 func pause_game():
 	GameManager.pause_game()
+	var pause_layer = CanvasLayer.new()
+	pause_layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(pause_layer)
 	var pause_menu = load("res://scenes/ui/pause_menu.tscn").instantiate()
-	pause_menu.process_mode = Node.PROCESS_MODE_ALWAYS
-	add_child(pause_menu)
+	pause_layer.add_child(pause_menu)
 
 func update_enemies_display():
 	if enemies_label:
