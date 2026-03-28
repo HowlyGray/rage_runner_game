@@ -2,14 +2,14 @@ extends Control
 
 var from_pause: bool = false
 
-@onready var master_slider = $CenterContainer/VBoxContainer/MasterVolume/HSlider
-@onready var music_slider = $CenterContainer/VBoxContainer/MusicVolume/HSlider
-@onready var sfx_slider = $CenterContainer/VBoxContainer/SFXVolume/HSlider
+@onready var master_slider = $CenterContainer/VBoxContainer/MasterVolume/HBoxContainer/HSlider
+@onready var music_slider = $CenterContainer/VBoxContainer/MusicVolume/HBoxContainer/HSlider
+@onready var sfx_slider = $CenterContainer/VBoxContainer/SFXVolume/HBoxContainer/HSlider
 @onready var back_button = $BackButton
 
-@onready var master_value_label = $CenterContainer/VBoxContainer/MasterVolume/ValueLabel
-@onready var music_value_label = $CenterContainer/VBoxContainer/MusicVolume/ValueLabel
-@onready var sfx_value_label = $CenterContainer/VBoxContainer/SFXVolume/ValueLabel
+@onready var master_value_label = $CenterContainer/VBoxContainer/MasterVolume/HBoxContainer/ValueLabel
+@onready var music_value_label = $CenterContainer/VBoxContainer/MusicVolume/HBoxContainer/ValueLabel
+@onready var sfx_value_label = $CenterContainer/VBoxContainer/SFXVolume/HBoxContainer/ValueLabel
 
 func _ready():
 	# Charger les valeurs actuelles
