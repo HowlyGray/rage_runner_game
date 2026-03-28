@@ -1,11 +1,11 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=15 format=3 uid="uid://cp2lo5xti47hw"]
 
-[ext_resource type="Script" path="res://scripts/game_scene.gd" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/game/player.tscn" id="2"]
-[ext_resource type="Script" path="res://scripts/comment_spawner.gd" id="3"]
-[ext_resource type="Script" path="res://scripts/ui/health_display.gd" id="4"]
-[ext_resource type="Script" path="res://scripts/ui/affliction_bar.gd" id="5"]
-[ext_resource type="Script" path="res://scripts/ui/confidence_bar.gd" id="6"]
+[ext_resource type="Script" uid="uid://bugejjjw8011" path="res://scripts/game_scene.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://bpl7lu4kdphtp" path="res://scenes/game/player.tscn" id="2"]
+[ext_resource type="Script" uid="uid://gg8orx0oyw28" path="res://scripts/comment_spawner.gd" id="3"]
+[ext_resource type="Script" uid="uid://cmuuo0v6ox5s1" path="res://scripts/ui/health_display.gd" id="4"]
+[ext_resource type="Script" uid="uid://b0s32ljpjh0uw" path="res://scripts/ui/affliction_bar.gd" id="5"]
+[ext_resource type="Script" uid="uid://ba13taucivvxe" path="res://scripts/ui/confidence_bar.gd" id="6"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.1, 0.1, 0.2, 1)
@@ -24,7 +24,9 @@ glow_enabled = true
 size = Vector3(200, 1, 200)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_1"]
-size = Vector2(200, 200)
+size = Vector2(2000, 2000)
+subdivide_width = 4
+subdivide_depth = 4
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
 albedo_color = Color(0.1, 0.1, 0.15, 1)
@@ -46,7 +48,7 @@ transform = Transform3D(0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, -0.75
 shadow_enabled = true
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 30, 15)
+transform = Transform3D(1, 0, 0, 0, 0.906308, 0.42261836, 0, -0.42261836, 0.906308, 0, 10, 18)
 current = true
 
 [node name="Arena" type="StaticBody3D" parent="."]

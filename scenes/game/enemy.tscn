@@ -1,15 +1,27 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=12 format=3 uid="uid://c7b3w2w5hhy4l"]
 
-[ext_resource type="Script" path="res://scripts/enemy.gd" id="1"]
+[ext_resource type="Script" uid="uid://wc7v3evoexuw" path="res://scripts/enemy.gd" id="1"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]
-size = Vector3(1, 1, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
-size = Vector3(1, 1, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
-albedo_color = Color(0.6, 0.0, 0.6, 1)
+albedo_color = Color(0.6, 0, 0.6, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_1t2yy"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oo557"]
+albedo_color = Color(0.6, 0, 0.6, 1)
+roughness = 0.3
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1t2yy"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sj18e"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dan2o"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a8edl"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_hitbox"]
 size = Vector3(1.2, 1.2, 1.2)
@@ -25,6 +37,31 @@ shape = SubResource("BoxShape3D_1")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="VisualRoot"]
 mesh = SubResource("BoxMesh_1")
 surface_material_override/0 = SubResource("StandardMaterial3D_1")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1.1920698, 0, 0, 0, 0.82064575, 0, 0, 0, 1.3141785, 0, 0.90170896, 0)
+mesh = SubResource("BoxMesh_1t2yy")
+surface_material_override/0 = SubResource("StandardMaterial3D_oo557")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1.1920698, 0, 0, 0, 0.3518572, 0, 0, 0, 0.49215016, -0.86081576, 0.90170896, 0)
+mesh = SubResource("BoxMesh_1t2yy")
+surface_material_override/0 = SubResource("StandardMaterial3D_1t2yy")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(1.1920698, 0, 0, 0, 0.3518572, 0, 0, 0, 0.49215016, 0.9142395, 0.90170896, 0)
+mesh = SubResource("BoxMesh_1t2yy")
+surface_material_override/0 = SubResource("StandardMaterial3D_sj18e")
+
+[node name="Horn" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(0.2598224, 0, 0, 0, 0.65243506, 0, 0, 0, 0.49215016, -1.3433955, 1.351797, 0)
+mesh = SubResource("BoxMesh_1t2yy")
+surface_material_override/0 = SubResource("StandardMaterial3D_dan2o")
+
+[node name="Horn2" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(0.2598224, 0, 0, 0, 0.65243506, 0, 0, 0, 0.49215016, 1.3857685, 1.351797, 0)
+mesh = SubResource("BoxMesh_1t2yy")
+surface_material_override/0 = SubResource("StandardMaterial3D_a8edl")
 
 [node name="Hitbox" type="Area3D" parent="."]
 

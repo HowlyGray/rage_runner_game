@@ -51,7 +51,7 @@ func _process(_delta):
 
 	if camera and player:
 		# Caméra suit le joueur en 3D avec un offset fixe
-		var target_pos = player.global_position + Vector3(0, 30, 15)
+		var target_pos = player.global_position + Vector3(0, 15, 18)
 		camera.global_position = camera.global_position.lerp(target_pos, 0.1)
 		camera.look_at(player.global_position, Vector3.UP)
 

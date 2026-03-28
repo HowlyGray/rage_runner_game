@@ -1,15 +1,17 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3 uid="uid://bpl7lu4kdphtp"]
 
-[ext_resource type="Script" path="res://scripts/player.gd" id="1"]
+[ext_resource type="Script" uid="uid://b60uyqsdpy0k7" path="res://scripts/player.gd" id="1"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1"]
-size = Vector3(1, 1, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_1"]
-size = Vector3(1, 1, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1"]
 albedo_color = Color(0, 0.8, 0.2, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_6w7gq"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dd427"]
 
 [node name="Player" type="CharacterBody3D" groups=["player"]]
 script = ExtResource("1")
@@ -23,6 +25,10 @@ shape = SubResource("BoxShape3D_1")
 mesh = SubResource("BoxMesh_1")
 surface_material_override/0 = SubResource("StandardMaterial3D_1")
 
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="VisualRoot"]
+transform = Transform3D(0.6819583, 0, 0, 0, 0.6926783, 0, 0, 0, 0.70559484, 0, 0.89766, 0)
+mesh = SubResource("SphereMesh_6w7gq")
+surface_material_override/0 = SubResource("StandardMaterial3D_dd427")
+
 [node name="DebuffTimer" type="Timer" parent="."]
-wait_time = 1.0
 one_shot = true
