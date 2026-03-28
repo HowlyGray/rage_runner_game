@@ -1,5 +1,7 @@
 extends Control
 
+var from_pause: bool = false
+
 @onready var master_slider = $CenterContainer/VBoxContainer/MasterVolume/HSlider
 @onready var music_slider = $CenterContainer/VBoxContainer/MusicVolume/HSlider
 @onready var sfx_slider = $CenterContainer/VBoxContainer/SFXVolume/HSlider
@@ -53,4 +55,10 @@ func _on_sfx_volume_changed(value):
 
 func _on_back_pressed():
 	GameManager.save_settings()
-	get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")
+	if from_pause:
+		var pause_menu = load("res://scenes/ui/pause_menu.tscn").instantiate()
+		pause_menu.process_mode = Node.PROCESS_MODE_ALWAYS
+		get_parent().add_child(pause_menu)
+		queue_free()
+	else:
+		get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn")

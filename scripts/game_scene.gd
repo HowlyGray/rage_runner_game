@@ -99,7 +99,7 @@ func wave_completed():
 	GameManager.set_meta("last_wave", current_wave)
 	GameManager.set_meta("last_wave_time", elapsed)
 	GameManager.set_meta("last_wave_score", wave_score)
-	get_tree().change_scene_to_file("res://scenes/ui/wave_intermission.tscn")
+	get_tree().call_deferred("change_scene_to_file", "res://scenes/ui/wave_intermission.tscn")
 
 func calculate_wave_score(elapsed_time: float) -> int:
 	var config = GameManager.get_wave_config(current_wave)
@@ -110,7 +110,9 @@ func calculate_wave_score(elapsed_time: float) -> int:
 
 func pause_game():
 	GameManager.pause_game()
-	get_tree().change_scene_to_file("res://scenes/ui/pause_menu.tscn")
+	var pause_menu = load("res://scenes/ui/pause_menu.tscn").instantiate()
+	pause_menu.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(pause_menu)
 
 func update_enemies_display():
 	if enemies_label:

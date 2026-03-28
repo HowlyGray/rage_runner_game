@@ -20,8 +20,8 @@ func _ready():
 		wave_label.text = "Vague %d terminée !" % wave_num
 
 	if time_label:
-		var minutes = int(elapsed) / 60
-		var seconds = int(elapsed) % 60
+		var minutes = int(elapsed / 60.0)
+		var seconds = int(fmod(elapsed, 60.0))
 		var centisecs = int(fmod(elapsed, 1.0) * 100)
 		time_label.text = "Temps : %02d:%02d.%02d" % [minutes, seconds, centisecs]
 
@@ -35,8 +35,8 @@ func _ready():
 	if best_time_label:
 		var best = GameManager.get_wave_best_time(wave_num)
 		if best > 0:
-			var bm = int(best) / 60
-			var bs = int(best) % 60
+			var bm = int(best / 60.0)
+			var bs = int(fmod(best, 60.0))
 			var bc = int(fmod(best, 1.0) * 100)
 			best_time_label.text = "Meilleur temps : %02d:%02d.%02d" % [bm, bs, bc]
 		else:
