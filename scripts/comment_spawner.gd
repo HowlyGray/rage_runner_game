@@ -64,25 +64,27 @@ func spawn_entity():
 
 func spawn_negative_comment():
 	if not comment_scene: return
+	var spawn_pos = get_spawn_position()
+	spawn_pos.y = 0.5
 	var comment = comment_scene.instantiate()
-	comment.position = get_spawn_position()
-	comment.position.y = 0.5
+	get_parent().add_child(comment)
+	comment.global_position = spawn_pos
 	var debuff_type = debuff_types[randi() % debuff_types.size()]
 	var target_pos = player.global_position if player else Vector3.ZERO
 	comment.setup(debuff_type, comment_speed, target_pos)
-	get_parent().add_child(comment)
 
 func spawn_compliment():
 	if not compliment_scene: return
+	var spawn_pos = get_spawn_position()
+	spawn_pos.y = 0.5
 	var compliment = compliment_scene.instantiate()
-	compliment.position = get_spawn_position()
-	compliment.position.y = 0.5
+	get_parent().add_child(compliment)
+	compliment.global_position = spawn_pos
 	var compliment_types = ["motivation", "encouragement", "positif"]
 	var compliment_type = compliment_types[randi() % compliment_types.size()]
 	var healing_time = randf_range(1.5, 3.0)
 	var target_pos = player.global_position if player else Vector3.ZERO
 	compliment.setup(compliment_type, comment_speed, healing_time, target_pos)
-	get_parent().add_child(compliment)
 
 func spawn_enemy():
 	if not enemy_scene: return

@@ -396,11 +396,11 @@ func shoot():
 	# Direction de tir basée sur l'orientation locale (avant = -Z en 3D Godot par convention, mais on utilise look_at donc c'est -Z)
 	var shoot_dir = -transform.basis.z.rotated(Vector3.UP, spread)
 
-	bullet.global_position = global_position + shoot_dir * 1.5
 	bullet.direction = shoot_dir
 	if is_emotionally_immune:
 		bullet.piercing = true
 	get_parent().add_child(bullet)
+	bullet.global_position = global_position + shoot_dir * 1.5
 
 	can_shoot = false
 	shoot_timer = shoot_cooldown

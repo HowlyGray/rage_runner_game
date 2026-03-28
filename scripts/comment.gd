@@ -32,13 +32,13 @@ const DEBUFF_COLORS = {
 
 func _ready():
 	body_entered.connect(_on_body_entered)
-	spawn_position = global_position
 	add_to_group("comments")
 	set_comment_appearance()
 
 func setup(type: String, spawn_speed: float, target_position: Vector3 = Vector3.ZERO):
 	debuff_type = type
 	speed = spawn_speed * 0.05
+	spawn_position = global_position
 
 	var texts = COMMENT_TEXTS.get(type, ["Commentaire rageux!"])
 	comment_text = texts[randi() % texts.size()]
