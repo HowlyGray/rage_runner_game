@@ -30,7 +30,11 @@ func _on_restart_pressed():
 	get_tree().change_scene_to_file("res://scenes/game/game_scene.tscn")
 
 func _on_settings_pressed():
-	get_tree().change_scene_to_file("res://scenes/ui/settings_menu.tscn")
+	var settings = load("res://scenes/ui/settings_menu.tscn").instantiate()
+	settings.from_pause = true
+	settings.process_mode = Node.PROCESS_MODE_ALWAYS
+	get_parent().add_child(settings)
+	queue_free()
 
 func _on_main_menu_pressed():
 	GameManager.resume_game()
