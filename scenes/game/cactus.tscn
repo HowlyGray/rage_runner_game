@@ -2,6 +2,9 @@
 
 [sub_resource type="BoxMesh" id="BoxMesh_ggq03"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ggq03"]
+albedo_color = Color(0.2041705, 0.41637895, 0.197315, 1)
+
 [sub_resource type="BoxMesh" id="BoxMesh_uywvy"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bc0cm"]
@@ -9,36 +12,34 @@ albedo_color = Color(0.2041705, 0.41637895, 0.197315, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_je5ag"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ggq03"]
-albedo_color = Color(0.2041705, 0.41637895, 0.197315, 1)
-
 [node name="Cactus" type="Node3D"]
 
 [node name="cactusTrunk" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.23155469, 0, 0, 0, 5.0304494, 0, 0, 0, 0.30115664, 0, 2.5586658, 0)
+transform = Transform3D(0.23155469, 0, 0, 0, 5.0304494, 0, 0, 0, 0.30115664, 0, 2.4958062, 0)
 mesh = SubResource("BoxMesh_ggq03")
+surface_material_override/0 = SubResource("StandardMaterial3D_ggq03")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.21331957, 0, 0, 0, 0.30345985, 0, 0, 0, 1.425782, 0.003, 2.5, 0.588)
+transform = Transform3D(0.21331957, 0, 0, 0, 0.30345985, 0, 0, 0, 1.425782, 0.003, 2.0466654, 0.588)
 mesh = SubResource("BoxMesh_uywvy")
 skeleton = NodePath("../cactusTrunk")
 surface_material_override/0 = SubResource("StandardMaterial3D_bc0cm")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.20402989, 0, 0, 0, 1.3208762, 0, 0, 0, 0.30115667, 0.004966911, 3.0256805, 1.0869496)
+transform = Transform3D(0.20402989, 0, 0, 0, 1.3208762, 0, 0, 0, 0.30115667, 0.004966911, 2.7387109, 1.1456598)
 rotation_edit_mode = 2
 mesh = SubResource("BoxMesh_je5ag")
 skeleton = NodePath("../cactusTrunk")
 surface_material_override/0 = SubResource("StandardMaterial3D_ggq03")
 
 [node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.21331957, 0, 0, 0, 0.30345985, 0, 0, 0, 1.425782, 0.003, 3.6110039, -0.6031752)
+transform = Transform3D(0.21331957, 0, 0, 0, 0.30345985, 0, 0, 0, 1.425782, 0.003, 3.273265, -0.6031752)
 mesh = SubResource("BoxMesh_uywvy")
 skeleton = NodePath("../cactusTrunk")
 surface_material_override/0 = SubResource("StandardMaterial3D_bc0cm")
 
 [node name="MeshInstance3D4" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.20402989, 0, 0, 0, 1.3208762, 0, 0, 0, 0.30115667, 0.004966911, 4.1366844, -1.151871)
+transform = Transform3D(0.20402989, 0, 0, 0, 1.3208762, 0, 0, 0, 0.30115667, 0.004966911, 3.9828992, -1.1586349)
 rotation_edit_mode = 2
 mesh = SubResource("BoxMesh_je5ag")
 skeleton = NodePath("../cactusTrunk")

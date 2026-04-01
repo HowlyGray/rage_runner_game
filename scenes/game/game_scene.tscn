@@ -1,13 +1,15 @@
-[gd_scene load_steps=17 format=3 uid="uid://cp2lo5xti47hw"]
+[gd_scene load_steps=19 format=3 uid="uid://cp2lo5xti47hw"]
 
 [ext_resource type="Script" uid="uid://bugejjjw8011" path="res://scripts/game_scene.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://bpl7lu4kdphtp" path="res://scenes/game/player.tscn" id="2"]
-[ext_resource type="Texture2D" uid="uid://b83x2c3ymsnvi" path="res://assets/sprites/texture_03.png" id="2_gu01l"]
+[ext_resource type="Texture2D" uid="uid://8kwvsm2nuehr" path="res://assets/sprites/texture_08.png" id="2_axn74"]
 [ext_resource type="Script" uid="uid://gg8orx0oyw28" path="res://scripts/comment_spawner.gd" id="3"]
 [ext_resource type="Script" uid="uid://cmuuo0v6ox5s1" path="res://scripts/ui/health_display.gd" id="4"]
 [ext_resource type="Script" uid="uid://b0s32ljpjh0uw" path="res://scripts/ui/affliction_bar.gd" id="5"]
 [ext_resource type="Script" uid="uid://ba13taucivvxe" path="res://scripts/ui/confidence_bar.gd" id="6"]
 [ext_resource type="PackedScene" uid="uid://ci0or4c286frg" path="res://scenes/game/cactus.tscn" id="7_06uhe"]
+[ext_resource type="PackedScene" uid="uid://s7t738578xrf" path="res://scenes/game/fence.tscn" id="9_axn74"]
+[ext_resource type="PackedScene" uid="uid://be73n180kwk38" path="res://scenes/game/house.tscn" id="10_fxxt8"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.1, 0.1, 0.2, 1)
@@ -31,9 +33,9 @@ subdivide_width = 4
 subdivide_depth = 4
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
-albedo_color = Color(0.1, 0.1, 0.15, 1)
-albedo_texture = ExtResource("2_gu01l")
-uv1_scale = Vector3(1.5, 1.5, 1.5)
+albedo_color = Color(0.50481945, 0.30094138, 0.05859591, 1)
+albedo_texture = ExtResource("2_axn74")
+uv1_scale = Vector3(0.5, 0.5, 0.5)
 uv1_triplanar = true
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wall_h"]
@@ -59,7 +61,6 @@ current = true
 [node name="Arena" type="StaticBody3D" parent="."]
 
 [node name="Floor" type="CollisionShape3D" parent="Arena"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 shape = SubResource("BoxShape3D_floor")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Arena/Floor"]
@@ -275,4 +276,43 @@ layout_mode = 2
 color = Color(0.2, 0.2, 0.2, 0.5)
 
 [node name="cactus" parent="." instance=ExtResource("7_06uhe")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.151887, 0.118918896, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.151887, 0, 0)
+
+[node name="cactus2" parent="." instance=ExtResource("7_06uhe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.151887, 0, 32.066853)
+
+[node name="cactus3" parent="." instance=ExtResource("7_06uhe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.317772, 0, 32.066853)
+
+[node name="cactus4" parent="." instance=ExtResource("7_06uhe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -77.22356, 0, 32.066853)
+
+[node name="cactus5" parent="." instance=ExtResource("7_06uhe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -77.22356, 0, -7.30418)
+
+[node name="cactus6" parent="." instance=ExtResource("7_06uhe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -77.22356, 0, -40.537525)
+
+[node name="Fence" parent="." instance=ExtResource("9_axn74")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -57.581818, 0, 0)
+
+[node name="Fence2" parent="." instance=ExtResource("9_axn74")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.742046, 0, -31.533432)
+
+[node name="Fence3" parent="." instance=ExtResource("9_axn74")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.058062, 0, 22.80308)
+
+[node name="Fence6" parent="." instance=ExtResource("9_axn74")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.058062, 0, 29.019445)
+
+[node name="Fence4" parent="." instance=ExtResource("9_axn74")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.382744, 0, -26.279966)
+
+[node name="Fence5" parent="." instance=ExtResource("9_axn74")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.301663, 0, 43.562164)
+
+[node name="Fence7" parent="." instance=ExtResource("9_axn74")]
+transform = Transform3D(-4.3711385e-08, 0, -0.99999994, 0, 1, 0, 0.99999994, 0, -4.3711385e-08, 11.301663, 0, 43.562164)
+
+[node name="House" parent="." instance=ExtResource("10_fxxt8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.462366, 0.9673805, 0.2827406)
